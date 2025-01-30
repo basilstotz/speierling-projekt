@@ -1,0 +1,3 @@
+#!/bin/sh
+
+scp -r css/  index.html  index.js amxa.ch:puclic_html/speierling/gis/statistics/.

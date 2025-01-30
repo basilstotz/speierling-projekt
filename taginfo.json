@@ -1,0 +1,75 @@
+{
+       "data_format": 1,
+       "data_url": "https://github.com/basilstotz/speierling-projekt/raw/refs/heads/main/taginfo.json",
+       "data_updated": "20250106T144242Z",
+       "project": {
+           "name": "Projekt Speierling",
+           "description": "The project aims to protect and progagate service trees",
+           "project_url": "https://speierling.arglos.ch",
+           "doc_url": "https://speierling.arglos.ch",
+           "contact_name": "Martin Dick",
+           "contact_email": "martindick56@gmail.com"
+       },
+    "tags": [
+	 { "key": "natural", "value": "tree"  },
+	 { "key": "natural", "value": "tree_stump"  },
+	 { "key": "species", "value": "Sorbus domestica"  },
+	 { "key": "circumference"  },
+	 { "key": "height" },
+	 { "key": "est_height" },
+	 { "key": "diameter_crown" },
+	 { "key": "ele" },
+	 { "key": "addr:country" },
+	 { "key": "addr:county" },
+	 { "key": "addr:place" },
+	 { "key": "image", "doc_url": "https://wiki.openstreetmap.org/wiki/Key%3Aimage" },
+	 {
+	     "key": "propagation",
+	     "value": "natural",
+	     "object_types": ["node"],
+	     "description": "progated naturaly",
+	     "doc_url": "https://wiki.openstreetmap.org/wiki/Key:propagation"    
+	 },
+	 {
+	     "key": "propagation",
+	     "value": "sucker",
+	     "object_types": ["node"],
+	     "description": "progated naturaly with a sucker",
+	     "doc_url": "https://wiki.openstreetmap.org/wiki/Key:propagation",
+	     "icon_url": ""
+	 },
+	 {
+	     "key": "propagation",
+	     "value": "planted",
+	     "object_types": ["node"],
+	     "description": "planted with unkown method",
+	     "doc_url": "https://wiki.openstreetmap.org/wiki/Key:propagation",
+	     "icon_url": ""
+	 },
+	 {
+	     "key": "propagation",
+	     "value": "seed",
+	     "object_types": ["node"],
+	     "description": "planted by seeds",
+	     "doc_url": "",
+	     "icon_url": ""     
+	 },
+	 {
+	     "key": "propagation",
+	     "value": "graft",
+	     "object_types": ["node"],
+	     "description": "planted by graft (on a rootstock)",
+	     "doc_url": "https://wiki.openstreetmap.org/wiki/Key:propagation",
+	     "icon_url": ""
+	 },
+	 {
+	     "key": "propagation",
+	     "value": "cutting",
+	     "object_types": ["node"],
+	     "description": "Planted by cutting (without a rootstocl",
+	     "doc_url": "https://wiki.openstreetmap.org/wiki/Key:propagation",
+	     "icon_url": ""
+	 }
+    ]
+}
+
