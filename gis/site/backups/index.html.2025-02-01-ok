@@ -146,9 +146,6 @@ function httpGet(theUrl, callback)
    function toStats(){
        document.getElementById("linker").href = "https://speierling.arglos.ch/gis/statistics/index"+destSuffix;
    }
-   function toTabular(){
-       document.getElementById("tabular").href = "https://speierling.arglos.ch/gis/tabelle/index"+destSuffix;
-   }
   </script>
 
 
@@ -171,9 +168,8 @@ langfristig erhalten bleibt</p>
     <p class="w3-xlarge w3-center" id="statsB" style="margin-top:14px;margin-bottom:32px"><br/><br/></p>
 
     <span class="w3-center w3-animate-top">
-      <a id="tabular"><button style="width:120px"><b>Tabelle</b></button></a>
       <a id="link"><button style="width:120px"><b>Karte</b></button></a>
-      <a id="linker"><button style="width:120px"><b>Statistik</b></button></a>
+<!--      <a id="linker"><button style="width:120px"><b>Statistik</b></button></a> -->
     </span>
   </div>
 
@@ -188,8 +184,7 @@ langfristig erhalten bleibt</p>
   </div>
 
   <div class="w3-display-topright w3-padding-large">
-    <span>Geoinformatik und Website: Basil Stotz</span>
-<!--     <a href="https://de.wikipedia.org/wiki/Speierling">Speierling auf Wikipedia</a> -->
+     <a href="https://de.wikipedia.org/wiki/Speierling">Speierling auf Wikipedia</a>
   </div>
 
 
@@ -225,7 +220,6 @@ langfristig erhalten bleibt</p>
 <script>
   toMap();
   toStats();
-  toTabular();
 </script>
 
 <script>

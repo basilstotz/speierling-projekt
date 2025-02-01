@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tabelle Projekt Speierling</title>
+  <!---
+  <link rel="stylesheet" href="styles.css">
+  --->
+
+  <script src="index.js"></script>
+
+  <script>
+    function getDestSuffix(){
+        let pathName=window.location.pathname;
+        let fileName=pathName.substring(pathName.lastIndexOf('/')+ 1);
+        if(fileName=='')fileName='index.html';
+
+        let destSuffix='.html';
+        if(fileName.split('_')[1])destSuffix='_'+fileName.split('_')[1];
+        return destSuffix
+    }
+
+    var destSuffix=getDestSuffix();
+    var devMode=(destSuffix!='.html');
+
+   function toHome(){
+       document.getElementById("home").href = "https://speierling.arglos.ch/gis/site/index"+destSuffix;
+   }
+  </script>
+
+  <script>
+     function onBody(){
+
+	 toHome();
+	 records=[];
+
+	 fetch('sorbusdomestica.geojson')
+	 .then((resp) => resp.json())
+	     .then(function(data) {
+		 let features=data.features;
+
+		 for(const feature of features){
+		     let tags=feature.properties.tags
+		     let coordinates=feature.geometry.coordinates;
+		     let link='https://openstreetmap.org/'+feature.id;
+		     tags['openstreetmap']=link;
+		     tags['lat']=coordinates[1];
+		     tags['lon']=coordinates[0];
+		     records.push(tags);
+		 }
+		 tableMain('tabelle',records,columns);     
+	 })
+	 .catch(function(error) {
+	   console.log(error);
+	 });
+     }    
+  </script>
+
+  
+  <style>
+
+    body {
+	background-color: grey;
+	font-family:arial;
+	color:white;
+    }
+
+    table {
+	color:black;
+    }
+    
+    thead {
+	background-color: #aaaaaa;
+    }
+
+    tbody {
+	background-color: white;
+    }
+    
+    tbody tr:nth-child(even) {
+	background-color: #dddddd;
+    }
+    
+  </style>
+</head>
+
+<body onload="onBody()" id="body">
+  <a id="home"><img src="images/home.png" style="opacity:0.7;width:30px;position:absolute"></a>
+  <h1 style="text-align:center">Projekt Speierling Tabelle</h1>
+  <span style="color:lightgrey;font-size:14px" id="disp"></span> 
+  <div style="margin:auto;background-color:grey" id="tabelle"></div>
+</body>
+
+
+</html
+
+  
+

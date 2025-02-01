@@ -32,15 +32,6 @@
   <link rel="stylesheet" href="css/index.css?v=1.0">
   <link rel="stylesheet" href="css/lightbox.min.css">
 
-<!---
-   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
-   integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin=""/>
-   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
-   integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin=""></script>
-
-   <script src="https://climateclock.world/widget-v2.js" async></script>
---->
 
    <!--- lightbox --->
    <script src="js/lightbox-plus-jquery.min.js"></script>
@@ -58,57 +49,48 @@
    <link rel="stylesheet" href="leaflet-gps/leaflet-gps.min.css"/>
    
    <!--- popup.js --->
-   <script src="popup-functions.js"></script>
-   <script src="popup-top.js"></script> 
-   <script src="popup-tabs.js"></script>
-   <script src="popup.js"></script>
+   <script src="devel/popup-functions.js"></script>
+   <script src="devel/popup-top.js"></script> 
+   <script src="devel/popup-tabs.js"></script>
+   <script src="devel/popup.js"></script>
    <link rel="stylesheet" href="css/tabulator.css"/>
 
    <!--- class tabelle -->
    <link rel="stylesheet" href="css/tabelle.css"/>
    
    <script src="js/plotly-2.35.2.min.js" charset="utf-8"></script>
-   <!--- osm-api-js --->
+   <!--- osm-api-js 
    <script src="js/osm-api.js"></script>
-
-
-
+   -->
    
    <script>
+      function stopSpinner() {
+	var element = document.getElementById("spinner");
+	element.classList.remove("spinner");
+      } 
 
 
-function stopSpinner() {
-  var element = document.getElementById("spinner");
-  element.classList.remove("spinner");
-} 
+      function httpGet(theUrl, callback){                                
+	  var xmlHttp = new XMLHttpRequest();
+	  xmlHttp.onreadystatechange = function() {
+	      if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+		  //stopSpinner()                                                                                         
+		  callback(xmlHttp.responseText);
+	      }                                                                                                           
+	  }         
+	  xmlHttp.open("GET", theUrl, true); // true for asynchronous
+	  xmlHttp.send(null);
+      }
 
-
-function httpGet(theUrl, callback){                                
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
-            //stopSpinner()                                                                                         
-            callback(xmlHttp.responseText);
-        }                                                                                                           
-    }         
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous
-    xmlHttp.send(null);
-}
-
-var sorbusdomestica={}
-var stats={}
+      var sorbusdomestica={}
+      var stats={}
 
 
      
-   let pathName=window.location.pathname;
-   let fileName=pathName.substring(pathName.lastIndexOf('/')+ 1);
-   var devMode=(fileName!='karte.html')
-</script>
-
-
-   
-   <!--- <script src="sorbusdomestica.js"></script> --->
-
+      let pathName=window.location.pathname;
+      let fileName=pathName.substring(pathName.lastIndexOf('/')+ 1);
+      var devMode=(fileName!='karte.html')
+   </script>
 
    <style>
       a:link {
@@ -137,6 +119,7 @@ var stats={}
   <div id="rohdaten" style="font-size:70%;display:block;transition:1s;width:300px;height:100%;background:white;opacity:0.8;position:fixed;top:0;right:-300px;z-index:5;padding:15px">
   </div>
 
+   <a href="https://speierling.arglos.ch/gis/site/index.html"><img src="images/home.png" style="z-index:5;opacity:0.7;width:30px;position:fixed;top:100;left:10"></a>
 
   <div style="display:block;transition:1s;width:300px;height:100%;background:white;opacity:0.8;position:fixed;top:0;right:-300px;z-index:5;padding:15px" id="mySidebar">
     <button style="position:relative;left:250px" onclick="w3_close()"><b>&times</b></button><br/>
@@ -268,7 +251,7 @@ var stats={}
     }
   </script>
 
-  <script src="karte.js"></script>
+  <script src="karte_devel.js"></script>
 
   <script>
   

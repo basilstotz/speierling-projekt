@@ -3,7 +3,7 @@
 
 ///////////////////////////////////////popup////////////////////////////////////////
 
-
+/*
 class Tabulator {
     constructor(parent){
 	this.parent = parent;
@@ -58,6 +58,8 @@ class Tabulator {
 	
     
 } // end class
+*/
+
 
 function projekt(feature){
     
@@ -67,14 +69,17 @@ function projekt(feature){
 
     let count = 0;
     txt='<table class="tabelle">'; 
-    for (const [key, value] of Object.entries(tags)) {
-	
+    for (let [key, value] of Object.entries(tags)) {
+  
+
         if(key.startsWith('speierlingproject:')){
 	    let k=key.split(':')[1];
 
 	    let deny=[ 'gebiet','datum'];
-	    if(!devMode)deny.push('hauptinfo');
-	    
+	    if(!devMode){
+		deny.push('hauptinfo');
+		deny.push('bemerkung');
+	    }
 	    if( !deny.includes(k) ){
 		let titel=false;
 		switch(k){
@@ -95,6 +100,7 @@ function projekt(feature){
 		    break;
 		case 'dna_probe':
 		    titel='DNA-Probe';
+		    if(value.trim()=='DNA')value='&#9989;'  
 		    break;
 		case 'bemerkung':
 		    titel='Bemerkung';
@@ -124,9 +130,8 @@ function projekt(feature){
 }
 
 
-function notes(feature, history){
+function notes(feature, diffs){
     
-    let diffs = diffHistory(history);
     let notes = getChanges(diffs,["note"])
 
     let notesDiv = false;
@@ -151,29 +156,20 @@ function notes(feature, history){
     return notesDiv
 }
 
-function dimension(feature, history){
+function dimension(feature, diffs){
 
-    let dim;
 
     let dimensionDiv = false;
-    let plotdata={}
+    let plotdata=[];
     
-    if(history){
-                                    
-        //get history data
-        let diffs = diffHistory(history);
-        let rawDim = getChanges(diffs, ["height","circumference"]);
-
-
-        dim=filterOutdatedDiffHistory(feature,rawDim);
-	
-	dim=addHistoricToDiffHistory(feature,dim);
-	
+    let dim=[];
+    if(diffs){
+	dim = getChanges(diffs, ["height","circumference"]);
     }
-   if(history && dim.length>1){
+    if(dim.length>1){
         const tags = feature.properties.tags;
         const id = feature.properties.id;
-       //const dimensionDiv = document.getElementById("dimension"+id);
+
        dimensionDiv = document.createElement('div');
         let line=0;
 
@@ -229,8 +225,10 @@ function dimension(feature, history){
 
        // muss vorwärts sein!
        for(let i=0;i<dim.length;i++){
+	   let record={}
 	   let line=dim[i];
 	   let timestamp=line.timestamp;
+	   record["timestamp"]=timestamp;
 	   if(minCircumference>0.1){
 	       datum=timestamp.slice(0,4)
 	   }else{
@@ -238,36 +236,49 @@ function dimension(feature, history){
 	   }
 	   if(line.circumference){
 	       circumference=line.circumference
+	       record["circumference"]=circumference;
 	   }else{
 	       circumference=''
 	   }
 
 	   if(line.height){
-	       height=line.height
+	       height=line.height;
+	       record['height']=height;
 	   }else{
 	       height=''
 	   }
 
 	   appendTableRow2(tabelle,false,'<b>'+datum+'</b>&nbsp;','&nbsp;'+circumference,'&nbsp;'+height);
-
+	   plotdata.push( record )
        }
        feature.properties["plotdata"] = plotdata; 
    }
     return dimensionDiv
 }
 
-function plot(feature){
+function plot(feature,diffs){
 
     let plotDiv=false;
-    let plotdata;
-    let layout;
-    //                    this is wrong. should be plotdata
-    if(feature.properties.plotdata2){
-	plotDiv = document.createElement('div');
-	plotDiv.setAttribute("id","plotdiv");
-	//plotDiv.id="plotdiv";
-	plotdata=feature.properties.plotdata;
-	Plotly.newPlot('plotdiv', plotdata, layout);
+    //let plotdata;
+    //let layout;
+    let plotdata = getChanges( diffs, ['circumference','height']);
+    
+    if(plotdata){
+    
+	let c=0;
+	let h=0;
+
+	for(let i=0;i<plotdata.length;i++){
+	    let record=plotdata[i];
+	    if(record.circumference)c++;
+	    if(record.height)h++;
+	}
+
+	if(h>=2 || c>=2){
+	    plotDiv = document.createElement('div');
+	    plotDiv.setAttribute("id","plotdiv");
+	    plotDiv.setAttribute('style','width:400px;height:300px;background-color:lightgrey');
+	}
     }
     return plotDiv;
 }
@@ -278,7 +289,6 @@ function backlink(feature){
     const id = feature.properties.id;
     const backlink = feature.properties.backlink;
     
-    //const backlinkDiv = document.getElementById("backlink"+id);
     let backlinkDiv = false;
     
     let txt;
@@ -316,23 +326,151 @@ function backlink(feature){
     
 }
 
-function tabs(parent, feature, history){
+function plotDim(feature,diffs){
+//function plotDim(feature){
+
+    //let plotdata=feature.properties.plotdata;
+    let plotdata=getChanges(diffs, ['circumference','height']);
+    
+    var umfang = {
+	x: [],
+	y: [],
+	yaxis: 'y',
+	name: 'Umfang',
+	type: 'scatter'
+    };
+
+    var hoehe = {
+	x: [],
+	y: [],
+	name: 'Höhe',
+	yaxis: 'y',
+	type: 'scatter'
+    };
+    
+
+    //let cMax=-200
+    //let hMax=-200;
+    
+    for(let i=0;i<plotdata.length;i++){
+	let record=plotdata[i];
+	//let x=decimalYear(record.timestamp);
+	let date=record.timestamp; 
+	if(record.circumference){
+	    //if(record.circumference>cMax)cMax=record.circumference;
+	    umfang.x.push(date);
+	    umfang.y.push(record.circumference.toString())
+	}
+	if(record.height){
+	    //if(record.height>hMax)hMax=record.height;
+	    hoehe.x.push(date);
+	    hoehe.y.push(record.height.toString())
+	}
+    }    
+    
+ 
+    let umfangAxis= {
+	rangemode: 'tozero',
+	autorange: true,
+	showgrid: true,
+	gridcolor: 'lightgrey',
+	ticks: 'inside',
+	
+	//range: [0.0,cMax],
+	//side: 'left',
+	title: { text: 'Umfang [m]' }	
+    }
+
+    let hoeheAxis= {
+	rangemode: 'tozero',
+	//autorange: true,
+	gridcolor: 'lightgrey',
+	//showgrid: true,
+	ticks: 'inside',
+	//range: [0.0,cMax],
+	//side: 'left',
+	linecolor: 'green',
+	title: { text: 'Höhe [m]' }	
+    }
+
+
+    let hoeheRechtsAxis = {
+	rangemode: 'tozero',
+	gridcolor: 'lightgrey',
+	showgrid: false,
+	//autorange: true,
+	//range: [0.0,hMax],
+	ticks: 'inside',
+	title: { text: 'Höhe [m]', font: {color: 'red'} },
+	tickfont: {color: 'red'},
+	overlaying: 'y',
+	side: 'right'
+    }
+    
+    let data;
+    let layout = {
+	paper_bgcolor: '#eeeeee',
+	plot_bgcolor: 'white',
+	font: { size: 10 },
+	//modebar: { remove: ["lasso","zoom","pan","boxselect","zoomin","zoomout","autoscale","reset" ] },
+	showlegend: false,
+	margin: { b:30, l:40, r:40, t:40 },
+	title: {text: 'Wachstum'},
+   
+	
+	xaxis: { title: { text: 'Datum' }, type: 'date', ticks: 'inside' },
+    };
+
+    let plotU = (umfang.x.length >= 2);
+    let plotH = (hoehe.x.length >= 2);
+
+    if(plotU && !plotH){
+	data = [ umfang ];
+	layout['yaxis']=umfangAxis;
+	layout.title.text="Umfang"
+    }
+    if(plotH && !plotU){
+	data = [ hoehe ]
+	layout['yaxis']=hoeheAxis;
+	layout.title.text="Höhe"
+    }
+
+    if(plotU && plotH){
+	hoehe.yaxis= 'y2';
+        layout['yaxis']=umfangAxis;
+	layout['y2axis']=hoeheRechtsAxis;
+	layout.title.text="Umfang und Höhe"
+	data= [ umfang, hoehe ];
+    }
+    
+    //var data = [trace1, trace2];
+    //console.log(data,layout)
+    let options = {staticPlot: true, displaylogo: false }
+    //console.log(data);
+    Plotly.newPlot('plotdiv', data, layout, options);
+
+}
+
+function tabs(parent, feature, diffs){
 
 
     let tabulator = new Tabulator(parent);
 
-    let dimensionElm = dimension(feature,history)
-    if (dimensionElm){
-	tabulator.addTab(dimensionElm,'<b>Wachstum</b>');
-	let plotElm = plot(feature);
-	if(plotElm) tabulator.addTab(plotElm,'<b>Plot</p>')
-    }
-    
-
     tabulator.addTab(backlink(feature), '<b>Kinder</b>');
+    
+    let plotElm = plot(feature,diffs);
+    if(plotElm){
+	tabulator.addTab(plotElm,'<b>Plot</b>');
+	plotDim(feature,diffs);
+    }
+
+    tabulator.addTab( dimension(feature,diffs), '<b>Wachstum</b>');
+        
     tabulator.addTab(projekt(feature), '<b>Projekt</b>');
-    if(devMode)tabulator.addTab(notes(feature, history), "<b>Notizen</b>");
+
+    if(devMode)tabulator.addTab(notes(feature, diffs), '<b>Notizen</b>');
 
     tabulator.openFirstTab();
+
 }
 

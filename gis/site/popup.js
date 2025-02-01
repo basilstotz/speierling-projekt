@@ -28,10 +28,11 @@ function content(feature){
     let dimDiv='<div id="dimension'+id+'"></div>';
     let linDiv='<div id="backlink'+id+'"></div>';
 
-    let tabDiv='<div id="tabs'+id+'" style="height:400px;overflow:auto"></div>';
+    let tabDiv='<div id="tabs'+id+'" style="min-height:200px"></div>';
+
+    style=""
     
-    
-    let content='<div id="content'+id+'" style="padding:5px;background:#eeeeee">'+
+    let content='<div id="content'+id+'" style="padding:5px;background:#eeeeee;max-height:400px;overflow:auto">'+
         titDiv+'<span>'+porDiv+karDiv+'</span>'+cDiv+bilDiv + notDiv+dimDiv+linDiv+tabDiv+
         '</div>';
 
@@ -40,36 +41,68 @@ function content(feature){
 
 }
 
-async function popupopen(event,feature){
 
-    const tags = feature.properties.tags; 
-    const id = feature.properties.id; 
-    
-    let history = false;
-    
-    if(tags.media){
-        const response = await fetch(tags.media);
-        media = await response.json();
-        if(media.type=="mediaCollection"){
-            feature.properties.media=media;
-        }
-    }
-
-    if(tags.circumference || tags.height || tags.crown_diameter){
-        history = await OSM.getFeatureHistory("node", id);
-    }else
-        history = false
-
+function doPopup(event,feature,diffs){
 
     let cont=content(feature);
     event.popup.setContent(cont);
 
     titel(feature);
-    portrait(feature,history);
+    portrait(feature,diffs);
     miniMap(feature);
     bilder(feature);
-    
+
+    const id = feature.properties.id; 
     let parentElm = document.getElementById("tabs"+id); 
-    tabs(parentElm, feature, history);
+    tabs(parentElm, feature, diffs);
+}
+
+
+function popupopen(event,feature){
+
+    const properties = feature.properties; 
+    //const id = feature.properties.id; 
+
+
+    let diffs=feature.properties.history;
+
+    /*
+    if(feature.properties.history){
+	let df = feature.properties.history;
+	diffs=processDiffHistory(feature, df );
+    }
+   */
+ 
+    if(properties.tags.media){
+	if(properties.media){
+	    doPopup(event,feature,diffs);
+	}else{
+	    fetch(tags.media)
+		.then((response) => response.json())
+		.then((data) => {
+		    properties.media=data
+		    doPopup(event,feature,diffs);
+		})
+	}
+    }else{
+	doPopup(event,feature,diffs);   
+    }
+
+    
+    /*
+    // get diffHistory
+    //t diffs;
+    //t online=false;
+   
+    if(tags[tags.circumference || tags.height || tags.crown_diameter){
+	if(online){
+            let hist = await OSM.getFeatureHistory("node", id);
+	    diffs = diffHistory(hist);
+	}else{
+	    if(feature.properties.history)diffs=feature.properties.history;
+	}
+	if(diffs)diffHist=processDiffHistory(feature,diffs);
+    }
+    */
 
 }

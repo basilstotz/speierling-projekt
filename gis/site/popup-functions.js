@@ -1,8 +1,67 @@
 
 // https://gis.stackexchange.com/questions/330608/leaflet-marker-popup-link-from-outside-of-map-dynamically
 
+class Tabulator {
+    constructor(parent){
+        this.parent = parent;
+        this.tabulator = document.createElement('div');
+        this.tabulator.setAttribute('class','tab');
+        this.tabcontent = [];
+        this.tablink = [];
+        parent.appendChild(this.tabulator);
+    }
+
+    addTab(content,text){
+        if(content){
+            let tab = document.createElement('div');
+            tab.className="tabcontent";
+            tab.setAttribute("style","display:none");
+
+            tab.appendChild(content);
+            
+            this.tabcontent.push(tab);
+            this.parent.appendChild(tab);
+
+            let index = this.tabcontent.length-1;
+            let button = document.createElement('button');
+            button.className = 'tablinks';
+            button.innerHTML=text;
+            button.addEventListener('click', (event) => { this.openTab(event,index)});
+
+            this.tablink.push(button);
+            this.tabulator.appendChild(button);
+            return tab
+        }else{
+            return false
+        }
+    }
+
+    openFirstTab(){
+        if(this.tablink[0])this.tablink[0].click();
+    }
+    
+    openTab(evt,index){
+        for (let i = 0; i < this.tabcontent.length; i++) {
+            if(index==i){
+                this.tabcontent[i].style.display = "block";
+                this.tablink[i].className += " active"
+                //evt.currentTarget.className += " active";
+            }else{
+                this.tabcontent[i].style.display = "none";
+                this.tablink[i].className = this.tablink[i].className.replace(" active", "");
+            }
+        }
+    }
+        
+    
+} // end class
+
+
 ///////////////////////////////////////popup////////////////////////////////////////
 
+function dateNowISO(){
+   return new Date().toISOString(); 
+}
 
 function decimalYear(dateString){
     let date = new Date(dateString);
@@ -143,7 +202,7 @@ function addHistoricToDiffHistory(feature,diffHistory){
     Object.entries(tags).forEach( ([key,value]) => {
 	if(key.startsWith('circumference:historic:')){
 	    let timestamp = key.split(':')[2]+'-01-01T00:00:00Z';
-	    tmp.push(  {timestamp: timestamp, circumference: value}   );
+	    tmp.push(  {timestamp: timestamp, circumference: value.toString()}   );
 	}
     })
 
@@ -151,19 +210,20 @@ function addHistoricToDiffHistory(feature,diffHistory){
     let b; //der letzte recors von historic
     if(tmp.length>0)b = tmp[tmp.length-1];
 
+    //dim = getChanges(diffHistory,['circumference']);
+    
     for(let i=0;i<diffHistory.length;i++){
 	let d=diffHistory[i];
 
 	if(i==0){
-	    if(b){
-		if(b.circumference != d.circumference)tmp.push(d)
-	    }else{
-		tmp.push(d)
+	    if(b && b.circumference){
+		if(d.circumference){
+		    // should probably allmost never happen!
+		    if( b.circumference == d.circumference  ){ delete d.circumference }
+		}
 	    }
-	}else{
-	    tmp.push(d)
 	}
-
+	tmp.push(d)
     };
     return tmp
 }
@@ -177,7 +237,7 @@ function filterOutdatedDiffHistory(feature, diffHistory){
     if(feature.properties.tags.start_date){
 	startDate = feature.properties.tags.start_date
     }else{
-	startDate = "1000"
+	startDate = "1000-01-01"
     }
     //dim = [];
     let oldLine = {};
@@ -204,6 +264,16 @@ function filterOutdatedDiffHistory(feature, diffHistory){
     return tmp
 }
 
+function processDiffHistory(feature,diffs){
+    if(diffs){
+	if(feature.properties.historynew){
+	    return diffs
+	}else{
+	    let stageone= filterOutdatedDiffHistory(feature, diffs);
+	    return addHistoricToDiffHistory(feature,stageone)
+	}
+    }   
+}
 
 function getChanges(distory,keys){
     let out=[];
@@ -229,4 +299,61 @@ function getChanges(distory,keys){
 }
 
 
+function calcGroth(feature){
 
+    let tags=feature.properties.tags;
+    let startDate;
+    
+    if(feature.properties.history){
+	let history = feature.properties.history;
+	let diffs = processDiffHistory(feature,history);
+	
+	dim = getChanges(diffs, ["circumference"]);
+	if(dim.length>=2){
+	    let erster = dim[0];
+	    let letzter = dim[dim.length-1];
+	    let dauer = decimalYear(letzter.timestamp)-decimalYear(erster.timestamp);
+	    let zuwachs = letzter.circumference - erster.circumference;
+	    let relativeZuwachs= zuwachs / letzter.circumference;
+	    if( relativeZuwachs>0.1 || dauer > 5.0 ){
+		let estimatedGroth=Math.round( (1000.0*zuwachs)/dauer )/10.0;
+		let estimatedAge = 100.0*letzter.circumference / estimatedGroth;
+		let estimatedStartDate = Math.round( decimalYear(letzter.timestamp)-estimatedAge)+'-01-01';
+		tags['start_date:estimated']=estimatedStartDate;
+		if(estimatedGroth<5.0&&estimatedGroth>0.0)tags['circumference:groth']=estimatedGroth;
+	    }
+	}
+
+	if(tags.start_date && dim.length>=1){
+	    let letzter = dim[dim.length-1];
+	    let dauer = ( decimalYear(letzter.timestamp)-decimalYear(tags.start_date) ) +2.0;
+	    let zuwachs = letzter.circumference;
+	    let groth= zuwachs/dauer;
+	    if(groth<0.05)tags['circumference:groth']=Math.round( (1000.0*groth ))/10.0;
+	}
+
+	
+	dim = getChanges(diffs, ["height"]);
+	if(dim.length>=2){
+	    let erster = dim[0];
+	    let letzter = dim[dim.length-1];
+	    startDate=erster.timestamp;
+	    let dauer = decimalYear(letzter.timestamp)-decimalYear(erster.timestamp);
+	    let zuwachs = letzter.height - erster.height;
+	    let relativeZuwachs= zuwachs / letzter.height;
+	    if( relativeZuwachs>0.1 || dauer > 1.0 ){
+		let estimatedGroth=Math.round( (10.0*zuwachs)/dauer )/10.0;
+		if(estimatedGroth<2.0&&estimatedGroth>0.0)tags['height:groth']=estimatedGroth;
+	    }
+	}else if(tags.start_date && dim.length>=1){
+	    let letzter = dim[dim.length-1];
+	    let dauer = ( decimalYear(letzter.timestamp)-decimalYear(tags.start_date) ) +2.0;
+	    let zuwachs = letzter.height;
+	    let groth= zuwachs/dauer;
+	    tags['height:groth']=Math.round( (10.0*groth ))/10.0;
+	}
+
+
+    }
+
+}

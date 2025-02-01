@@ -3,25 +3,7 @@
 
 ///////////////////////////////////////popup////////////////////////////////////////
 
-function portrait(feature, history){
-
-    let last_update=false;
-    let wachstum;
-    
-    if(history){
-        let diffs = diffHistory(history);
-
-	diffs=addHistoricToDiffHistory(feature,diffs)
-
-	let dim = getChanges(diffs, ["height","circumference","diameter_crown"]);
-	last_update = dim[dim.length-1].timestamp;
-	dim = getChanges(diffs, ["circumference"]);
-	let erster = dim[0];
-	let letzter = dim[dim.length-1];
-	let dauer = decimalYear(letzter.timestamp)-decimalYear(erster.timestamp);
-	let zuwachs = letzter.circumference - erster.circumference;
-	if(dauer>0.0)wachstum=Math.round((1000.0*zuwachs)/dauer)/10.0;
-    }
+function portrait(feature, diffs){
 
     
     const tags = feature.properties.tags;
@@ -52,12 +34,6 @@ function portrait(feature, history){
 	table.appendChild(row);
     }
 
-    /*
-    #tabelle table{width:100%;}
-    #tabelle tr:nth-child(odd){background-color: #ffffff;}
-    #tabelle tr:hover {background-color: #ddd;}
-    */
-
     
     let tabelle = document.createElement("table");
     tabelle.setAttribute("style","padding-top:10px;padding-bottom:10px");
@@ -71,17 +47,8 @@ function portrait(feature, history){
     appendTableRow(tabelle, 'Position:', '<a href="geo:'+lat+','+lon+'">'+lat+', '+lon+'</a>');
 
 
-    /*
-    let yearTimestamp 
-    if(tags["meta:timestamp"]){
-        yearTimestamp = tags["meta:timestamp"].slice(0,4);
-    }else{
-        yearTimestamp=2025;  
-    }
-    */
-    
-    if(tags.circumference||tags.diameter_crown||tags.height){
-	appendTableRow(tabelle, "letzte Datenerhebung:", year(last_update));
+    if(tags.latest_update){
+	appendTableRow(tabelle, "Daten von:", year(tags.latest_update));
     }
     
     if(tags.circumference) {           
@@ -122,7 +89,7 @@ function portrait(feature, history){
     }
     if(feature.properties.parentFeature){
         let parent = feature.properties.parentFeature;
-        // later will be pOrt = tags["addr:gemeinde]
+
         let pOrt = parent.properties.tags["addr:full"].split(',')[0];
         let pGebiet = parent.properties.tags["speierlingproject:gebiet"];
         let pCoords = parent.geometry.coordinates;
@@ -130,42 +97,51 @@ function portrait(feature, history){
 	let herkunft = '<span style="color:rgb(0,120,168)" onclick="map.setView(L.latLng('+pCoords[1]+','+pCoords[0]+'))">'+pOrt+'/'+pGebiet+'</span>';
 	appendTableRow(tabelle, "Herkunft:", herkunft)
     }
-    
-    if(tags.start_date){
-	let a = 2025 - tags.start_date;
-	appendTableRow(tabelle, "Pflanzjahr:", tags.start_date );
-	appendTableRow(tabelle, "Alter:", a+' Jahre')
-    }else{
-	if(tags.circumference){
-	    let groth;
-	    if(wachstum){
-		groth=100.0/wachstum;
-	    }else{
-		groth=60
-	    }
-	    let starter=Math.round( (2025-tags.circumference*groth)/10.0 ) * 10;
-	     let desc;
-	     if(tags.propagation=="natural" || tags.propagation=="sucker"){
-		 desc="gesch.&nbsp;Keimjahr:";
-	     }else{
-		 desc="gesch.&nbsp;Pflanzjahr:";
-	     }   
-	    appendTableRow(tabelle, desc, starter);
-        }
-    }
 
-    if(tags.circumference && tags.start_date){
-	let a=year(last_update)-tags.start_date
-       let w=tags.circumference/a;
-       if(a>9){
-           w=Math.round(1000.0*w)/10;
-	   appendTableRow(tabelle, "BHU-Wachstum:", w+' cm/a');
-       }
-    }else if(wachstum){
-	appendTableRow(tabelle, "BHU-Wachstum:", wachstum+' cm/a');
+    /*
+    let jetzt=dateNowISO();
+    */
+    
+    if(tags['start_date'] || tags['start_date:estimated']){
+	
+	let desc=''
+	let start;
+	let meth;
+	if(tags.propagation){
+	    switch(tags.propagation){
+	    case 'natural':
+	    case 'sucker':
+		meth='Keimjahr';
+		break;
+	    default:
+		meth='Planzjahr';
+		break;	    
+	    }
+	}
+	if(tags['start_date']){
+	    desc='';
+	    start=tags['start_date'];
+	    start=Math.round(decimalYear(start));
+	}else if(tags['start_date:estimated']){
+	    desc='geschätztes ';
+	    start=tags['start_date:estimated'];
+            start=Math.round(decimalYear(start));
+	    if(start<2000){
+		start=Math.round(start/10)*10;
+	    }
+	}
+	
+	appendTableRow(tabelle, desc+meth, start);
+    }
+    
+    if(tags['circumference:growth']){
+	   appendTableRow(tabelle, "BHU-Wachstum:", tags['circumference:growth']+' cm/a');
+    }else if(tags['circumference:growth:estimated']){
+	   appendTableRow(tabelle, "BHU-Wachstum:", tags['circumference:growth:estimated']+' cm/a');
     }
 
     if(tags["speierlingproject:Fruechte"]){
+	
 	appendTableRow(tabelle, "Früchte:", tags["speierlingproject:Fruechte"])
     }
     
