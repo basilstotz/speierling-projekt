@@ -90,7 +90,7 @@
 	 }
 
 	 let records=[];
-	 fetch('https://speierling.arglos.ch/gis/data/sorbusdomestica.geojson')
+	 fetch('../data/sorbusdomestica.geojson')
 	 .then((resp) => resp.json())
 	     .then(function(data) {
 		 let features=data.features;

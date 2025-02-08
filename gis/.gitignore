@@ -1,0 +1,6 @@
+*.csv
+alt
+archive
+tmp
+site/node/**
+*~

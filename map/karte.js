@@ -373,7 +373,7 @@ httpGet('Rect.geojson', addGeojsonRect);
 
 httpGet('Sorbus_domestica_plg.geojson', addGeojsonDistri);
 
-httpGet('https://speierling.arglos.ch/gis/data/sorbusdomestica.geojson', addGeojsonLayer);
+httpGet('../data/sorbusdomestica.geojson', addGeojsonLayer);
 
 
 let ziel=0;

@@ -22,7 +22,7 @@ function clone(x){
     return JSON.parse(JSON.stringify(x));
 }
 
-const url = 'https://speierling.arglos.ch/gis/data/sorbusdomestica.geojson';
+const url = '../data/sorbusdomestica.geojson';
 
 
 function onBody(){

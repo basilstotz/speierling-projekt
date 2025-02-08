@@ -137,7 +137,7 @@ langfristig erhalten bleibt</p>
 var sorbusdomestica={}
 var stats={}
 
-httpGet('https://speierling.arglos.ch/gis/data/sorbusdomestica.geojson', (text) => { 
+httpGet('data/sorbusdomestica.geojson', (text) => { 
       sorbusdomestica=JSON.parse(text);
       stats.all=sorbusdomestica.features.length;
       stats.project=0;
