@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="styles.css">
   --->
 
-  <script src="index.js"></script>
 
   <script>
     function getDestSuffix(){
@@ -26,17 +25,72 @@
     var devMode=(destSuffix!='.html');
 
    function toHome(){
-       document.getElementById("home").href = "https://speierling.arglos.ch/gis/site/index"+destSuffix;
+       document.getElementById("home").href = "https://speierling.arglos.ch/gis/index"+destSuffix;
    }
   </script>
 
+  <script src="tabelle.js"></script>
+  <link rel="stylesheet" href="tabelle.css">
+  
   <script>
+
+     function propagation(elm,inhalt){
+	 let color;
+	 switch(inhalt){
+	 case 'natural':
+	     color='mediumseagreen';
+	     break;
+	 case 'sucker':
+	     color='yellow';
+	     break;
+	 case 'planted':
+	     color='dodgerblue';
+	     break;
+	 case 'seed':
+	     color='tomato'
+	     break;
+	 case 'graft':
+	     color='orange'
+	     break;
+	 default:
+	     //color='lightgrey'
+	     break;
+	 }
+	 if(color)elm.setAttribute('style','background-color:'+color);
+     }
+
+    
      function onBody(){
 
 	 toHome();
-	 records=[];
 
-	 fetch('sorbusdomestica.geojson')
+	 let columns = [
+	     {title:"Land", field:"addr:country", sorter:"string",headerFilter:true },
+	     {title:"Kanton", field:"addr:state", sorter:"string",headerFilter:true },
+	     {title:"Gemeinde", field:"addr:gemeinde", sorter:"string", headerFilter:true  },
+	     {title:"Gebiet", field:"speierlingproject:gebiet", sorter:"string", headerFilter:true },
+	     {title:"Vermehrungstyp", field:"propagation", styleFunc: propagation, sorter:"string", headerFilter:true },
+	     {title:"Datum", field:"start_date", sorter:"numeric",headerFilter:false   },
+	     {title:"Umfang", field:"circumference", sorter:"numeric",headerFilter:false  },
+	     {title:"Höhe", field:"height", sorter:"numeric", headerFilter:false  },
+
+	     {title: "Lat", field: "lat", hidden: true  },
+	     {title: "Lon", field: "lon", hidden: true  },
+	     {title: "Id", field: "id", hidden: true  }
+	 ];
+
+	 let options= {
+	     status: {
+		 counter: "Speierlinge",
+		 title: false,
+	         download: "Aktuelle Ansicht als CSV-Datei herunterladen"
+	     },
+	     noNames: false,
+	     noTable: false,
+	 }
+
+	 let records=[];
+	 fetch('https://speierling.arglos.ch/gis/data/sorbusdomestica.geojson')
 	 .then((resp) => resp.json())
 	     .then(function(data) {
 		 let features=data.features;
@@ -45,12 +99,13 @@
 		     let tags=feature.properties.tags
 		     let coordinates=feature.geometry.coordinates;
 		     let link='https://openstreetmap.org/'+feature.id;
-		     tags['openstreetmap']=link;
+		     if(!tags['addr:state'])tags['addr:state']=tags['addr:gemeinde'];
+		     tags['id']=feature.id;
 		     tags['lat']=coordinates[1];
 		     tags['lon']=coordinates[0];
 		     records.push(tags);
 		 }
-		 tableMain('tabelle',records,columns);     
+		 new Tabelle('tabelle', records, columns, options);     
 	 })
 	 .catch(function(error) {
 	   console.log(error);
@@ -60,37 +115,40 @@
 
   
   <style>
-
     body {
-	background-color: grey;
 	font-family:arial;
 	color:white;
+	background-color: rgba(255,255,255,0);
+	
     }
-
-    table {
-	color:black;
+    h1 {
+	text-align:center
     }
-    
-    thead {
-	background-color: #aaaaaa;
+    #tabelle {
+	background-color: rgba(255,255,255,0);
+	margin:auto;
     }
-
-    tbody {
-	background-color: white;
+    #home {
+	z-index:5;
+	opacity:0.7;
+	position:absolute;
+	top:20px;
+	left:20px;
     }
-    
-    tbody tr:nth-child(even) {
-	background-color: #dddddd;
-    }
-    
+   .bgimg {
+       background-image: url('images/background.jpg');
+   /*  min-height: 100%;
+     background-position: center;
+     background-size: cover;*/
+   }
   </style>
 </head>
 
-<body onload="onBody()" id="body">
-  <a id="home"><img src="images/home.png" style="opacity:0.7;width:30px;position:absolute"></a>
-  <h1 style="text-align:center">Projekt Speierling Tabelle</h1>
-  <span style="color:lightgrey;font-size:14px" id="disp"></span> 
-  <div style="margin:auto;background-color:grey" id="tabelle"></div>
+<body class="bgimg" onload="onBody()">
+  <a id="home"><img style="width:30px" src="images/home.png"></a>
+  <h1>Projekt Speierling Tabelle</h1>
+  <!--<span style="color:lightgrey;font-size:14px" id="disp"></span>--> 
+  <div id="tabelle"></div>
 </body>
 
 

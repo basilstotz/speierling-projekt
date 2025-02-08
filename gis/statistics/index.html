@@ -23,9 +23,11 @@
   
   <link rel="stylesheet" href="css/tabulator.css">
   <link rel="stylesheet" href="css/raleway.css">
-  <link rel="stylesheet" href="css/index.css">
+
+  <link rel="stylesheet" href="index.css">
 
   <script src="js/plotly.js"></script>
+
   <script src="popup-functions.js"></script>
 
   <script>
@@ -48,11 +50,13 @@
 <body class="bgimg" onload="onBody()">
   <!-- cc0 -> https://www.svgrepo.com/svg/22031/home-icon-silhouette -->
   <a id="homelink"><img src="images/home.png" style="opacity:0.7;width:30px;position:absolute"></a>
+
   <script>
-    document.getElementById('homelink').href='https://speierling.arglos.ch/gis/site/index'+destSuffix;
+    document.getElementById('homelink').href='https://speierling.arglos.ch/gis/index'+destSuffix;
   </script>
+
   <h2 style="text-align:center">Speierling Projekt Statistik</h2>
   <div id="inhalt" style="margin:auto;max-width:708px"></div>
-  <script src="index.js"></script>
+  <script src="statistics.js"></script>
 </body>
 </html>
