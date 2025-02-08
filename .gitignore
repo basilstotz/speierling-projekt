@@ -1,6 +1,6 @@
 *.csv
 alt
 archive
-csv
-map/node/**
+tmp
+site/node/**
 *~

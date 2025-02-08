@@ -6,17 +6,19 @@ pwd
 
 ./bin/update-history.sh >> ./update-history/update-history.log
 
+cp ./../../node/mediaIndex.json mediaIndex.json
+
 cat ./osm/sorbusdomestica.geojson | \
-            ./bin/devel/check-tags.js | \
-            ./bin/devel/process-nominatim.js | \
-            ./bin/devel/process-media.js ./tmp/bilder.json | \
-            ./bin/devel/process-project.js ./tmp/project.json 2> project.log | \
-            ./bin/devel/add-historic.js   | \
-            ./bin/devel/process-history.js ./update-history/history.geojson  |  \
-	    ./bin/devel/add-growth.js > sorbusdomestica.geojson
+            ./bin/check-tags.js | \
+            ./bin/process-nominatim.js | \
+            ./bin/add-media.js mediaIndex.json | \
+            ./bin/process-project.js ./tmp/project.json 2> project.log | \
+            ./bin/add-historic.js   | \
+            ./bin/process-history.js ./update-history/history.geojson  |  \
+	    ./bin/add-growth.js > sorbusdomestica.geojson
               
 
-cat sorbusdomestica_devel.geojson | ./bin/devel/reduce.js | ./bin/devel/flatten-tags.js > ./../../sorbusdomestica.geojson
+cat sorbusdomestica.geojson | ./bin/devel/reduce.js | ./bin/devel/flatten-tags.js > ./../../sorbusdomestica.geojson
 
 
 echo "done"
