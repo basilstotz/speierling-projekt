@@ -7,7 +7,7 @@ pwd
 ./bin/update-history.sh >> ./update-history/update-history.log
 
 #cp ./../../node/mediaIndex.json mediaIndex.json
-curl https://speierling.arglos.ch/node/mediaIndex.json -O mediaIndex.json
+curl https://speierling.arglos.ch/node/mediaIndex.json 2>/dev/null  >mediaIndex.json
 
 cat ./osm/sorbusdomestica.geojson | \
             ./bin/check-tags.js | \
