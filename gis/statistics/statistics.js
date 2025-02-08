@@ -520,7 +520,7 @@ function general(id,records){
     Plotly.newPlot(id, data, layout,options );
 }
 
-	
+/*	
 var archive = {
   "2023-07-08": {
     "trees": 1229,
@@ -588,3 +588,4 @@ var archive = {
   }
 };
     
+*/

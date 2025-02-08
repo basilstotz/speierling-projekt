@@ -37,4 +37,6 @@ function calc(dirName){
 
 }
 
-fs.writeFileSync('archive-stats.json', JSON.stringify(out,null,2));
+let text='var archive = \n'+JSON.stringify(out,null,2)+';';
+
+fs.writeFileSync('archive-stats.js',text );
