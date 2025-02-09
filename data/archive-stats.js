@@ -1,67 +1,13 @@
-var archive = 
-{
-  "2023-07-08": {
-    "trees": 1229,
-    "pics": 2766
-  },
-  "2023-07-09": {
-    "trees": 1229,
-    "pics": 2766
-  },
-  "2023-07-14": {
-    "trees": 1229,
-    "pics": 2766
-  },
-  "2023-07-19": {
-    "trees": 1229,
-    "pics": 2772
-  },
-  "2023-07-20": {
-    "trees": 1230,
-    "pics": 2771
-  },
-  "2023-07-30": {
-    "trees": 1235,
-    "pics": 2773
-  },
-  "2023-08-09": {
-    "trees": 1238,
-    "pics": 2789
-  },
-  "2023-09-05": {
-    "trees": 1246,
-    "pics": 2829
-  },
-  "2023-10-16": {
-    "trees": 1269,
-    "pics": 2970
-  },
-  "2023-12-20": {
-    "trees": 1351,
-    "pics": 3178
-  },
-  "2024-01-25": {
-    "trees": 1420,
-    "pics": 3310
-  },
-  "2024-03-08": {
-    "trees": 1452,
-    "pics": 3517
-  },
-  "2024-04-04": {
-    "trees": 1491,
-    "pics": 3635
-  },
-  "2024-06-08": {
-    "trees": 1639,
-    "pics": 4380
-  },
-  "2025-01-02": {
-    "trees": 2022,
-    "pics": 4717
-  },
-  "2025-01-22": {
-    "trees": 2052,
-    "pics": 4823
-  }
-};
+<!DOCTYPE html>
+<html style="height:100%">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<title> 404 Not Found
+</title></head>
+<body style="color: #444; margin:0;font: normal 14px/20px Arial, Helvetica, sans-serif; height:100%; background-color: #fff;">
+<div style="height:auto; min-height:100%; ">     <div style="text-align: center; width:800px; margin-left: -400px; position:absolute; top: 30%; left:50%;">
+        <h1 style="margin:0; font-size:150px; line-height:150px; font-weight:bold;">404</h1>
+<h2 style="margin-top:20px;font-size: 30px;">Not Found
+</h2>
+<p>The resource requested could not be found on this server!</p>
+</div></div></body></html>
