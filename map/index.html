@@ -133,7 +133,7 @@
   <div id="rohdaten" style="font-size:70%;display:block;transition:1s;width:300px;height:100%;background:white;opacity:0.8;position:fixed;top:0;right:-300px;z-index:5;padding:15px">
   </div>
 
-   <a href="https://speierling.arglos.ch/gis/index.html"><img src="images/home.png" id="home"></a>
+   <a id="homelink"><img src="images/home.png" id="home"></a>
 
   <div style="display:block;transition:1s;width:300px;height:100%;background:white;opacity:0.8;position:fixed;top:0;right:-300px;z-index:5;padding:15px" id="mySidebar">
     <button style="position:relative;left:250px" onclick="w3_close()"><b>&times</b></button><br/>
@@ -268,7 +268,10 @@
   <script src="karte.js"></script>
 
   <script>
-  
+
+    let home=document.getElementById('homelink');
+    home.href=window.location.href.replace('/map','');
+    
     function w3_open(){
 	let d=document.getElementById("mySidebar").style; d.right="0px";
 	let b=document.getElementById("button").style; b.display="none";

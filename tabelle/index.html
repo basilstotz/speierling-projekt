@@ -24,8 +24,8 @@
     var destSuffix=getDestSuffix();
     var devMode=(destSuffix!='.html');
 
-   function toHome(){
-       document.getElementById("home").href = "https://speierling.arglos.ch/gis/index"+destSuffix;
+    function toHome(){
+	document.getElementById("home").href = window.location.href.replace('/tabelle','');
    }
   </script>
 
